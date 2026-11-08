@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Administrador · Link IA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007BFF'/%3E%3Ccircle cx='12' cy='16' r='5' fill='none' stroke='white' stroke-width='2.4'/%3E%3Ccircle cx='20' cy='16' r='5' fill='none' stroke='white' stroke-width='2.4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;800&display=swap">
+<style>
+:root{--navy:#0A192F;--blue:#007BFF;--blue-btn:#0068DB;--blue-ink:#0062CC;--silver:#B0B7C3;--bg:#F3F6FB;--ink:#0A192F;--ink-2:#44546b;--line:#dbe3ee;--red:#c0262d;--green:#0b7a3a;--radius:14px;
+--font-title:'Montserrat','Segoe UI',system-ui,sans-serif;--font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit}
+.ico{width:1.2em;height:1.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:3px solid #3d9bff;outline-offset:2px;border-radius:6px}
+/* botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:10px;border:1.5px solid transparent;font-weight:600;cursor:pointer;background:var(--blue-btn);color:#fff;transition:filter .15s,transform .15s;text-decoration:none;line-height:1.2}
+.btn:hover{filter:brightness(1.1)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn--ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn--ghost:hover{border-color:#9db4d4;filter:none}
+.btn--danger{background:#fff;color:var(--red);border-color:#f0c4c7}
+.btn--sm{padding:6px 11px;font-size:.88rem;border-radius:8px}
+.btn--icon{padding:6px 9px}
+/* barra superior */
+.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20}
+.top__in{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-title);font-weight:800;font-size:1.25rem}
+.brand i{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#1a8cff,#0057b8);font-style:normal}
+.brand b{color:#3d9bff}
+.brand small{font-family:var(--font-body);font-weight:500;font-size:.8rem;color:var(--silver);margin-left:4px}
+.top__sp{flex:1}
+.top .btn--ghost{background:transparent;color:#fff;border-color:rgba(176,183,195,.45)}
+.tabs{max-width:1200px;margin:0 auto;padding:0 16px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+.tab{padding:11px 16px;border:0;background:transparent;color:var(--silver);font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:#fff}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--blue)}
+.tab .cnt{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:99px;background:#0068DB;color:#fff;font-size:.75rem;text-align:center}
+main{max-width:1200px;margin:0 auto;padding:22px 16px 120px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 6px 20px rgba(10,25,47,.05)}
+.card + .card{margin-top:16px}
+.h{font-family:var(--font-title);font-weight:800;font-size:1.3rem}
+.sub{color:var(--ink-2);margin-top:4px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.sp{flex:1}
+/* login */
+.login{max-width:420px;margin:8vh auto 0}
+.login .card{padding:28px}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:14px;min-width:0}
+.field>label,.lab{font-weight:600;font-size:.88rem;color:var(--navy)}
+.field input,.field select,.field textarea,.f{width:100%;padding:10px 12px;border:1.5px solid #c8d3e3;border-radius:10px;background:#fbfcfe;color:var(--ink)}
+.field textarea{min-height:90px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus,.f:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,123,255,.18)}
+.hint{font-size:.82rem;color:var(--ink-2)}
+.msg{margin-top:14px;padding:11px 14px;border-radius:10px;font-weight:600;font-size:.9rem}
+.msg.err{background:#fdecee;color:#8b1a22;border:1px solid #f2b6bb}
+.msg.ok{background:#e6f7ed;color:#0b5a2b;border:1px solid #a8e0bd}
+.msg.warn{background:#fff6e0;color:#7a5200;border:1px solid #f0d58a}
+/* cotizaciones */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;text-align:left}
+.stat small{display:block;color:var(--ink-2);font-size:.8rem}
+.stat b{font-family:var(--font-title);font-size:1.6rem}
+.stat.on{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,123,255,.15)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tools .f{width:auto;flex:1;min-width:180px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:860px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f7f9fd;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);position:sticky;top:0}
+tr.main{cursor:pointer}
+tr.main:hover td{background:#f7faff}
+tr.det td{background:#f7f9fd}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.78rem;font-weight:700}
+.pill.nuevo{background:#e3f0ff;color:#0a4fa8}.pill.contactado{background:#fff1d6;color:#8a5a00}.pill.cotizado{background:#ece5ff;color:#4b2fa0}.pill.cerrado{background:#e2f6e9;color:#0b6a31}
+td a{color:var(--blue-ink)}
+.nw{white-space:nowrap}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.det-grid{grid-template-columns:1fr}}
+.pre{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+.empty{padding:36px;text-align:center;color:var(--ink-2)}
+/* editores */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.item{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;margin-top:12px}
+.item.off{opacity:.65;background:#f7f9fd}
+.item__h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.item__h b{flex:1;min-width:120px}
+.num{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:#e3f0ff;color:#0a4fa8;font-weight:700;font-size:.8rem}
+.chk{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:.88rem;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--blue)}
+.imgf{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.thumb{width:92px;height:60px;border-radius:8px;border:1px solid var(--line);background:#e7edf6 center/cover no-repeat;flex:none}
+.imgf .f{flex:1;min-width:160px}
+.mods{display:grid;gap:10px;margin-top:12px}
+.mod{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.mod span{flex:1}
+.mod small{display:block;color:var(--ink-2)}
+.sw{position:relative;width:46px;height:26px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0}
+.sw i{position:absolute;inset:0;border-radius:99px;background:#c8d3e3;transition:background .2s}
+.sw i::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw input:checked+i{background:var(--blue)}
+.sw input:checked+i::after{transform:translateX(20px)}
+.sw input:focus-visible+i{outline:3px solid #3d9bff;outline-offset:2px}
+/* barra de cambios */
+.dirty{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--navy);color:#fff;padding:12px 16px;box-shadow:0 -8px 24px rgba(0,0,0,.25)}
+.dirty__in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dirty__in span{flex:1;min-width:180px;font-weight:600}
+.dirty .btn--ghost{background:transparent;color:#fff;border-color:rgba(176,183,195,.5)}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:40;background:#0A192F;color:#fff;padding:11px 18px;border-radius:10px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:92vw}
+.toast.err{background:#8b1a22}
+.setup{background:#fff6e0;border:1px solid #f0d58a;border-radius:12px;padding:14px;margin-top:16px;color:#7a5200}
+code{background:#eef2f9;padding:1px 6px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4.6"/><circle cx="16" cy="12" r="4.6"/></symbol>
+    <symbol id="i-ethernet" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 0 1 1 1v8l-2 2v3a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-3l-2-2V4a1 1 0 0 1 1-1z"/><path d="M10 7v3M12 7v3M14 7v3"/></symbol>
+    <symbol id="i-fiber" viewBox="0 0 24 24"><path d="M2 7h6c3.5 0 3.5 10 7 10h7"/><path d="M2 17h6c3.5 0 3.5-10 7-10h7"/><path d="M2 12h20"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8.8a15 15 0 0 1 20 0"/><path d="M5 12.9a10 10 0 0 1 14 0"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M12 20h.01"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></symbol>
+    <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="14" width="4" height="6" rx="1.6"/><rect x="17.5" y="14" width="4" height="6" rx="1.6"/><path d="M20 20c0 1.5-2 2-5 2"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9.5 8.5L7 10.5l2.5 2M14.5 8.5l2.5 2-2.5 2"/><path d="M2 21h20"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M3 8h16"/><path d="M15 4l4 4-4 4"/><path d="M21 16H5"/><path d="M9 12l-4 4 4 4"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M9.2 8.3c-.3.3-.5.9-.2 1.7.6 1.6 2.3 3.4 4 4.2.9.4 1.5.2 1.9-.1l.6-.8c.1-.2.1-.4-.1-.5l-1.4-.8c-.2-.1-.4 0-.5.1l-.5.6c-1-.4-1.8-1.2-2.3-2.2l.5-.5c.1-.1.2-.3.1-.5l-.7-1.5c-.1-.2-.3-.3-.5-.2z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 1 1 .9-8.9A6 6 0 0 1 19.5 11 3.5 3.5 0 0 1 18 18z"/></symbol>
+  </defs>
+</svg>
+
+
+<!-- ===== ACCESO ===== -->
+<div id="loginView" class="login" hidden>
+  <div class="card">
+    <div class="brand" style="color:var(--navy)"><i style="color:#fff"><svg class="ico" style="width:22px;height:22px;stroke-width:2.1"><use href="#i-logo"/></svg></i><span>Link <b>IA</b></span></div>
+    <h1 class="h" style="margin-top:18px">Acceso de administrador</h1>
+    <p class="sub">Entra para ver las cotizaciones y editar la página.</p>
+    <form id="loginForm" novalidate>
+      <div class="field"><label for="lEmail">Correo</label><input id="lEmail" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="lPass">Contraseña</label><input id="lPass" type="password" autocomplete="current-password" required></div>
+      <div class="msg err" id="lMsg" role="alert" hidden></div>
+      <button class="btn" style="width:100%;margin-top:18px;padding:13px" type="submit" id="lBtn">Entrar</button>
+    </form>
+    <div class="setup" id="lSetup" hidden>
+      <b>Falta conectar la base de datos.</b><br>
+      Abre este archivo con el Bloc de notas, busca <code>SUPABASE_URL</code> y <code>SUPABASE_KEY</code> al inicio del script y pega tus datos de Supabase (Project Settings → API).
+    </div>
+    <p class="hint" style="margin-top:16px"><a href="index.html" id="backLink">← Volver a la página</a></p>
+  </div>
+</div>
+
+<!-- ===== PANEL ===== -->
+<div id="appView" hidden>
+  <header class="top">
+    <div class="top__in">
+      <div class="brand"><i><svg class="ico" style="width:20px;height:20px;stroke-width:2.1"><use href="#i-logo"/></svg></i><span>Link <b>IA</b><small>Administrador</small></span></div>
+      <span class="top__sp"></span>
+      <span class="hint" id="who" style="color:var(--silver)"></span>
+      <a class="btn btn--ghost btn--sm" id="viewSite" href="index.html" target="_blank" rel="noopener">Ver página</a>
+      <button class="btn btn--ghost btn--sm" data-act="logout" type="button">Salir</button>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" role="tab" data-act="tab" data-v="cot">Cotizaciones<span class="cnt" id="cntNew" hidden></span></button>
+      <button class="tab" role="tab" data-act="tab" data-v="contacto">WhatsApp y contacto</button>
+      <button class="tab" role="tab" data-act="tab" data-v="servicios">Servicios</button>
+      <button class="tab" role="tab" data-act="tab" data-v="noticias">Noticias</button>
+      <button class="tab" role="tab" data-act="tab" data-v="modulos">Módulos</button>
+      <button class="tab" role="tab" data-act="tab" data-v="imagenes">Logo e imágenes</button>
+    </nav>
+  </header>
+  <main id="main"></main>
+  <div class="dirty" id="dirtyBar" hidden>
+    <div class="dirty__in">
+      <span>Tienes cambios sin guardar en la página.</span>
+      <button class="btn btn--ghost btn--sm" data-act="discard" type="button">Descartar</button>
+      <button class="btn btn--sm" data-act="save" type="button" id="saveBtn">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* ==========================================================================
+   LINK IA · PANEL DE ADMINISTRADOR
+   Entra con el correo y contraseña del usuario que creaste en Supabase
+   (Authentication > Users). Todo lo que guardes aquí se refleja en la página.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  /* ---------- CONFIGURACIÓN (edita aquí) ---------------------------------- */
+  // Los MISMOS datos que pegaste en index.html (Supabase > Project Settings > API)
+  var SUPABASE_URL = '';   // ejemplo: 'https://abcdefgh.supabase.co'
+  var SUPABASE_KEY = '';   // clave anon public
+  var CONFIG_TABLE = 'sitio_config', QUOTE_TABLE = 'cotizaciones', BUCKET = 'sitio';
+
+  var DEFAULTS = {
+ "whatsapp": "523325941532",
+ "contacto": {
+  "direccion": "Calle Principal 123, Col. Centro,\nCiudad de México, CDMX, C.P. 06000",
+  "telefono": "+52 33 2594 1532",
+  "correo": "contacto@linkia.com.mx"
+ },
+ "logo": "",
+ "hero_imagen": "",
+ "modulos": {
+  "wa1": true,
+  "servicios": true,
+  "wa2": true,
+  "noticias": true,
+  "cotizar": true,
+  "wa3": true
+ },
+ "servicios": [
+  {
+   "titulo": "Cableado Estructurado",
+   "icono": "ethernet",
+   "etiquetas": [
+    "Cat6A",
+    "TIA/EIA",
+    "ISO/IEC 11801"
+   ],
+   "descripcion": "Diseño e instalación de redes físicas bajo normativas internacionales (TIA/EIA e ISO/IEC 11801) con certificación de puntos, rotulado y racks ordenados para garantizar orden y escalabilidad.",
+   "imagen": "https://picsum.photos/seed/linkia-cable/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Fibra Óptica",
+   "icono": "fiber",
+   "etiquetas": [
+    "Backbone",
+    "Monomodo",
+    "Multimodo"
+   ],
+   "descripcion": "Implementación de enlaces de alta velocidad y backbone de fibra óptica, con fusión, pruebas OTDR y certificación para lograr la máxima transferencia de datos entre edificios y sitios.",
+   "imagen": "https://picsum.photos/seed/linkia-fiber/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "WiFi de Última Generación",
+   "icono": "wifi",
+   "etiquetas": [
+    "WiFi 6/7",
+    "Site survey",
+    "WPA3"
+   ],
+   "descripcion": "Redes inalámbricas de alto rendimiento (WiFi 6/7) con estudio de cobertura, roaming transparente, control de canales y seguridad empresarial WPA3 para alta densidad de usuarios.",
+   "imagen": "https://picsum.photos/seed/linkia-wifi/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Enlaces WAN, LAN y VLAN",
+   "icono": "network",
+   "etiquetas": [
+    "Routing",
+    "VLAN",
+    "SD-WAN"
+   ],
+   "descripcion": "Configuración de redes locales y amplias, segmentación de tráfico mediante VLAN, QoS y conectividad segura entre sucursales con VPN y enrutamiento dinámico.",
+   "imagen": "https://picsum.photos/seed/linkia-network/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Firewall",
+   "icono": "shield",
+   "etiquetas": [
+    "NGFW",
+    "VPN",
+    "IPS/IDS"
+   ],
+   "descripcion": "Seguridad perimetral con firewalls de nueva generación: filtrado de contenido, prevención de intrusiones, protección contra amenazas y políticas de acceso robustas por usuario y aplicación.",
+   "imagen": "https://picsum.photos/seed/linkia-firewall/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Soporte Corporativo",
+   "icono": "wrench",
+   "etiquetas": [
+    "24/7",
+    "Preventivo",
+    "Correctivo"
+   ],
+   "descripcion": "Mantenimiento preventivo y correctivo de servidores, red y equipos, con monitoreo y contratos de nivel de servicio (SLA) para mantener tu infraestructura operativa 24/7.",
+   "imagen": "https://picsum.photos/seed/linkia-servers/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Helpdesk",
+   "icono": "headset",
+   "etiquetas": [
+    "Tickets",
+    "SLA",
+    "Remoto"
+   ],
+   "descripcion": "Mesa de ayuda ágil para la resolución de incidencias de usuarios finales, con registro de tickets, asistencia remota y seguimiento hasta el cierre del caso.",
+   "imagen": "https://picsum.photos/seed/linkia-helpdesk/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Aplicaciones",
+   "icono": "code",
+   "etiquetas": [
+    "A medida",
+    "Web",
+    "Integración"
+   ],
+   "descripcion": "Desarrollo, despliegue y gestión de software empresarial: aplicaciones web a medida, integraciones entre sistemas, automatización de procesos y mantenimiento continuo.",
+   "imagen": "https://picsum.photos/seed/linkia-code/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Base de Datos",
+   "icono": "database",
+   "etiquetas": [
+    "Respaldo",
+    "Tuning",
+    "Alta disp."
+   ],
+   "descripcion": "Administración, optimización y resguardo de la información crítica de tu empresa: afinación de consultas, respaldos verificados, replicación y planes de recuperación ante desastres.",
+   "imagen": "https://picsum.photos/seed/linkia-database/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Migraciones de ERP",
+   "icono": "swap",
+   "etiquetas": [
+    "Datos",
+    "Pruebas",
+    "Go-live"
+   ],
+   "descripcion": "Transición segura y eficiente de sistemas de planificación de recursos empresariales: depuración y mapeo de datos, ensayos de migración y acompañamiento durante la puesta en marcha.",
+   "imagen": "https://picsum.photos/seed/linkia-erp/640/360",
+   "visible": true
+  },
+  {
+   "titulo": "Asesorías Expertas",
+   "icono": "bulb",
+   "etiquetas": [
+    "Linux",
+    "Microsoft 365",
+    "Estrategia"
+   ],
+   "descripcion": "Consultoría especializada en entornos Linux y Microsoft 365: arquitectura, licenciamiento, seguridad, buenas prácticas y hojas de ruta tecnológicas para tu empresa.",
+   "imagen": "https://picsum.photos/seed/linkia-consulting/640/360",
+   "visible": true
+  }
+ ],
+ "noticias": [
+  {
+   "categoria": "Redes inalámbricas",
+   "titulo": "WiFi 7 en la empresa: qué mejora frente a WiFi 6 y cuándo conviene migrar",
+   "resumen": "Más ancho de banda por canal y menor latencia abren la puerta a oficinas con alta densidad de dispositivos. Repasamos qué considerar antes de renovar tu red inalámbrica.",
+   "diasAtras": 1,
+   "url": "#noticias",
+   "imagen": "https://picsum.photos/seed/linkia-wifi/640/400"
+  },
+  {
+   "categoria": "Ciberseguridad",
+   "titulo": "Segmentación y confianza cero: el siguiente paso en seguridad perimetral",
+   "resumen": "Separar el tráfico por VLAN y aplicar políticas de acceso mínimo reduce el impacto de una intrusión. Te explicamos cómo empezar sin detener la operación.",
+   "diasAtras": 3,
+   "url": "#noticias",
+   "imagen": "https://picsum.photos/seed/linkia-seguridad/640/400"
+  },
+  {
+   "categoria": "ERP y datos",
+   "titulo": "Migrar tu ERP sin sorpresas: checklist de datos, pruebas y plan de contingencia",
+   "resumen": "Una migración exitosa se decide antes del arranque: depuración de datos, ensayos y un plan de retorno claro. Estos son los puntos que no deben faltar.",
+   "diasAtras": 6,
+   "url": "#noticias",
+   "imagen": "https://picsum.photos/seed/linkia-erp/640/400"
+  }
+ ],
+ "bloques": []
+};
+  var ICONS = ['ethernet', 'fiber', 'wifi', 'network', 'shield', 'wrench', 'headset', 'code', 'database', 'swap', 'bulb', 'server', 'cloud'];
+  var ICON_NAMES = { ethernet: 'Cable de red', fiber: 'Fibra óptica', wifi: 'WiFi', network: 'Red / VLAN', shield: 'Seguridad', wrench: 'Soporte', headset: 'Helpdesk', code: 'Aplicaciones', database: 'Base de datos', swap: 'Migración', bulb: 'Asesoría', server: 'Servidores', cloud: 'Nube' };
+  var ESTADOS = ['nuevo', 'contactado', 'cotizado', 'cerrado'];
+  var SLOTS = { hero: 'Después de la portada', servicios: 'Después de los servicios', noticias: 'Después de las noticias' };
+  var MODULES = [
+    ['wa1', 'Banner de WhatsApp tras la portada', 'Franja con el botón "¿Hablamos?"'],
+    ['servicios', 'Servicios', 'Cuadrícula de servicios y su enlace en el menú'],
+    ['wa2', 'Banner de WhatsApp tras los servicios', 'Franja con el botón "¿Hablamos?"'],
+    ['noticias', 'Noticias de tecnología', 'Sección de noticias y su enlace en el menú'],
+    ['cotizar', 'Formulario de cotización', 'Formulario, botón "Cotizar Ahora" y "Cotizar este servicio"'],
+    ['wa3', 'Banner de WhatsApp final', 'Franja de WhatsApp antes del pie de página']
+  ];
+
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function digits(s) { return String(s || '').replace(/\D/g, ''); }
+  function safeUrl(u) { u = String(u || '').trim(); return /^https?:\/\//i.test(u) ? u : ''; }
+  function base() { return SUPABASE_URL.replace(/\/+$/, ''); }
+
+  var S = { session: null, cfg: null, saved: '', rows: [], tab: 'cot', f: { q: '', estado: 'todos', servicio: '' }, open: null, loadErr: '' };
+
+  /* ---------- Configuración: mezcla con valores de fábrica ---------------- */
+  function mergeCfg(b, over) {
+    var out = clone(b);
+    Object.keys(over || {}).forEach(function (k) {
+      var v = over[k];
+      if (v === null || v === undefined) return;
+      if (v && typeof v === 'object' && !Array.isArray(v) && out[k] && typeof out[k] === 'object' && !Array.isArray(out[k])) {
+        Object.keys(v).forEach(function (kk) { if (v[kk] !== null && v[kk] !== undefined) out[k][kk] = v[kk]; });
+      } else { out[k] = v; }
+    });
+    return out;
+  }
+  function isoDaysAgo(n) { var d = new Date(Date.now() - n * 864e5); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function normalize(c) {
+    (c.noticias || []).forEach(function (n) { if (!n.fecha) n.fecha = isoDaysAgo(n.diasAtras || 0); delete n.diasAtras; });
+    (c.servicios || []).forEach(function (s) { if (!Array.isArray(s.etiquetas)) s.etiquetas = []; if (s.visible === undefined) s.visible = true; });
+    (c.bloques || []).forEach(function (b) { if (b.visible === undefined) b.visible = true; });
+    return c;
+  }
+
+  /* ---------- Sesión y llamadas a Supabase -------------------------------- */
+  function saveSession() { try { sessionStorage.setItem('linkia_admin', JSON.stringify(S.session)); } catch (e) { /* ok */ } }
+  function loadSession() { try { S.session = JSON.parse(sessionStorage.getItem('linkia_admin') || 'null'); } catch (e) { S.session = null; } }
+  function toSession(j, email) { return { access: j.access_token, refresh: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000, email: email || (j.user && j.user.email) || '' }; }
+  function authHeaders(extra) {
+    var h = { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + (S.session ? S.session.access : SUPABASE_KEY) };
+    for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+  function ensureToken() {
+    if (!S.session) return Promise.reject(new Error('AUTH'));
+    if (S.session.exp - 60000 > Date.now()) return Promise.resolve();
+    return fetch(base() + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: S.session.refresh }) })
+      .then(function (r) { if (!r.ok) throw new Error('AUTH'); return r.json(); })
+      .then(function (j) { S.session = toSession(j, S.session.email); saveSession(); });
+  }
+  function api(path, opts) {
+    opts = opts || {};
+    return ensureToken().then(function () {
+      return fetch(base() + path, { method: opts.method || 'GET', headers: authHeaders(opts.headers), body: opts.body });
+    }).then(function (r) {
+      if (r.status === 401) throw new Error('AUTH');
+      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 160)); });
+      return r.status === 204 || opts.noBody ? null : r.text().then(function (t) { return t ? JSON.parse(t) : null; });
+    });
+  }
+  function errText(e) {
+    var m = (e && e.message) || '';
+    if (m === 'AUTH') return 'Tu sesión expiró. Vuelve a entrar.';
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Sin conexión con la base de datos.';
+    return 'No se pudo completar (' + m + ').';
+  }
+
+  /* ---------- Avisos ------------------------------------------------------ */
+  var toastT;
+  function toast(msg, err) { var t = $('#toast'); t.textContent = msg; t.className = 'toast' + (err ? ' err' : ''); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, err ? 6000 : 2600); }
+
+  /* ---------- Acceso ------------------------------------------------------ */
+  function showLogin(msg) {
+    $('#appView').hidden = true; $('#loginView').hidden = false;
+    $('#lSetup').hidden = !!(SUPABASE_URL && SUPABASE_KEY);
+    var m = $('#lMsg'); m.hidden = !msg; m.textContent = msg || '';
+  }
+  function logout(msg) { S.session = null; try { sessionStorage.removeItem('linkia_admin'); } catch (e) { /* ok */ } showLogin(msg); }
+
+  $('#loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = $('#lEmail').value.trim(), pass = $('#lPass').value;
+    if (!SUPABASE_URL || !SUPABASE_KEY) { showLogin('Primero conecta la base de datos (ver aviso abajo).'); return; }
+    if (!email || !pass) { showLogin('Escribe tu correo y contraseña.'); return; }
+    var btn = $('#lBtn'); btn.disabled = true; btn.textContent = 'Entrando…';
+    fetch(base() + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, password: pass }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.j && /invalid|credentials/i.test(JSON.stringify(res.j)) ? 'BAD' : 'HTTP');
+        S.session = toSession(res.j, email); saveSession(); $('#lPass').value = '';
+        return start();
+      })
+      .catch(function (er) {
+        showLogin(er.message === 'BAD' ? 'Correo o contraseña incorrectos.' : /Failed to fetch|NetworkError|Load failed/i.test(er.message) ? 'Sin conexión con la base de datos. Revisa tu internet y que el proyecto de Supabase no esté pausado.' : 'No se pudo entrar (' + er.message + ').');
+      })
+      .then(function () { btn.disabled = false; btn.textContent = 'Entrar'; });
+  });
+
+  /* ---------- Arranque: verifica permisos y carga datos ------------------- */
+  function start() {
+    return api('/rest/v1/rpc/es_admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      .then(function (ok) {
+        if (ok !== true) { logout('Este usuario no tiene permiso de administrador. Revisa el correo escrito en el SQL (función es_admin).'); throw new Error('HANDLED'); }
+        return Promise.all([
+          api('/rest/v1/' + CONFIG_TABLE + '?id=eq.1&select=config'),
+          api('/rest/v1/' + QUOTE_TABLE + '?select=*&order=creado.desc&limit=1000')
+        ]);
+      })
+      .then(function (res) {
+        S.cfg = normalize(mergeCfg(DEFAULTS, res[0] && res[0][0] && res[0][0].config));
+        S.saved = JSON.stringify(S.cfg); S.rows = res[1] || [];
+        $('#who').textContent = S.session.email;
+        $('#loginView').hidden = true; $('#appView').hidden = false;
+        render();
+      })
+      .catch(function (er) { if (er.message === 'HANDLED') return; if (er.message === 'AUTH') logout('Tu sesión expiró. Vuelve a entrar.'); else { logout(errText(er)); } });
+  }
+
+  /* ---------- Utilidades de edición por ruta ------------------------------ */
+  function getPath(o, p) { return p.split('.').reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
+  function setPath(o, p, v) { var ks = p.split('.'), last = ks.pop(), t = ks.reduce(function (a, k) { return a[k]; }, o); t[last] = v; }
+  function isDirty() { return JSON.stringify(S.cfg) !== S.saved; }
+  function markDirty() { $('#dirtyBar').hidden = !isDirty(); }
+
+  /* ---------- Render general ---------------------------------------------- */
+  function render() {
+    $$('.tab').forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.v === S.tab)); });
+    var nuevos = S.rows.filter(function (r) { return r.estado === 'nuevo'; }).length, c = $('#cntNew');
+    c.hidden = !nuevos; c.textContent = nuevos;
+    var h = { cot: viewCot, contacto: viewContacto, servicios: viewServicios, noticias: viewNoticias, modulos: viewModulos, imagenes: viewImagenes }[S.tab]();
+    $('#main').innerHTML = h;
+    markDirty();
+  }
+
+  /* ===== COTIZACIONES ===== */
+  function fmtDate(s) { var d = new Date(s); return isNaN(d) ? '' : d.toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' }); }
+  function filtered() {
+    var q = S.f.q.trim().toLowerCase();
+    return S.rows.filter(function (r) {
+      if (S.f.estado !== 'todos' && r.estado !== S.f.estado) return false;
+      if (S.f.servicio && r.servicio !== S.f.servicio) return false;
+      if (q && [r.nombre, r.empresa, r.correo, r.telefono, r.servicio, r.comentarios, r.notas].join(' ').toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+  function waTo(tel) { var d = digits(tel); if (d.length === 10) d = '52' + d; return d ? 'https://wa.me/' + d : ''; }
+  function viewCot() {
+    var cnt = { todos: S.rows.length }; ESTADOS.forEach(function (e) { cnt[e] = S.rows.filter(function (r) { return r.estado === e; }).length; });
+    var servicios = Array.from(new Set(S.rows.map(function (r) { return r.servicio; }))).sort();
+    var list = filtered();
+    var h = '<div class="stats">' + ['todos'].concat(ESTADOS).map(function (e) {
+      return '<button type="button" class="stat' + (S.f.estado === e ? ' on' : '') + '" data-act="festado" data-v="' + e + '"><small>' + ({ todos: 'Todas', nuevo: 'Nuevas', contactado: 'Contactadas', cotizado: 'Cotizadas', cerrado: 'Cerradas' })[e] + '</small><b>' + cnt[e] + '</b></button>';
+    }).join('') + '</div>';
+    h += '<div class="tools"><input class="f" id="q" type="search" placeholder="Buscar por nombre, empresa, correo, teléfono…" value="' + esc(S.f.q) + '" aria-label="Buscar">' +
+      '<select class="f" id="fServ" aria-label="Filtrar por servicio" style="max-width:260px"><option value="">Todos los servicios</option>' + servicios.map(function (s) { return '<option' + (S.f.servicio === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>' +
+      '<button class="btn btn--ghost" type="button" data-act="csv">Descargar CSV</button><button class="btn btn--ghost" type="button" data-act="reload">Actualizar</button></div>';
+    if (!list.length) return h + '<div class="card empty">' + (S.rows.length ? 'No hay cotizaciones con ese filtro.' : 'Aún no hay cotizaciones. Cuando alguien llene el formulario de la página, aparecerá aquí.') + '</div>';
+    h += '<p class="hint" style="margin-bottom:8px">' + list.length + ' de ' + S.rows.length + ' cotizaciones · toca una fila para ver los detalles</p>';
+    h += '<div class="tw"><table><thead><tr><th>Fecha</th><th>Nombre</th><th>Empresa</th><th>Contacto</th><th>Servicio</th><th>Estado</th></tr></thead><tbody>';
+    list.forEach(function (r) {
+      var open = S.open === r.id, wa = waTo(r.telefono);
+      h += '<tr class="main" data-act="toggle" data-id="' + esc(r.id) + '"><td class="nw">' + esc(fmtDate(r.creado)) + '</td><td><b>' + esc(r.nombre) + '</b></td><td>' + esc(r.empresa) + '</td>' +
+        '<td>' + esc(r.telefono) + '<br><span class="hint">' + esc(r.correo) + '</span></td><td>' + esc(r.servicio) + '</td><td><span class="pill ' + esc(r.estado) + '">' + esc(r.estado) + '</span></td></tr>';
+      if (open) {
+        h += '<tr class="det"><td colspan="6"><div class="det-grid"><div>' +
+          '<div class="lab">Comentarios del cliente</div><div class="pre">' + (r.comentarios ? esc(r.comentarios) : '<span class="hint">Sin comentarios</span>') + '</div>' +
+          '<div class="row" style="margin-top:12px">' + (wa ? '<a class="btn btn--sm" target="_blank" rel="noopener" href="' + esc(wa) + '">Escribir por WhatsApp</a>' : '') +
+          '<a class="btn btn--ghost btn--sm" href="mailto:' + esc(r.correo) + '">Enviar correo</a><a class="btn btn--ghost btn--sm" href="tel:' + esc(digits(r.telefono)) + '">Llamar</a></div>' +
+          '<p class="hint" style="margin-top:10px">Recibida: ' + esc(fmtDate(r.creado)) + ' · ID ' + esc(String(r.id).slice(0, 8)) + '</p></div><div>' +
+          '<div class="field" style="margin-top:0"><label for="est">Estado</label><select id="est" data-act="estado" data-id="' + esc(r.id) + '">' + ESTADOS.map(function (e) { return '<option' + (r.estado === e ? ' selected' : '') + '>' + e + '</option>'; }).join('') + '</select></div>' +
+          '<div class="field"><label for="nota">Notas internas</label><textarea id="nota" placeholder="Seguimiento, llamadas, montos…">' + esc(r.notas || '') + '</textarea></div>' +
+          '<div class="row" style="margin-top:10px"><button class="btn btn--sm" type="button" data-act="nota" data-id="' + esc(r.id) + '">Guardar nota</button><span class="sp"></span><button class="btn btn--danger btn--sm" type="button" data-act="delcot" data-id="' + esc(r.id) + '">Eliminar</button></div>' +
+          '</div></div></td></tr>';
+      }
+    });
+    return h + '</tbody></table></div>';
+  }
+  function csvCell(v) { v = String(v == null ? '' : v); return /[",\n\r;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function exportCsv() {
+    var cols = [['creado', 'Fecha'], ['nombre', 'Nombre'], ['empresa', 'Empresa'], ['correo', 'Correo'], ['telefono', 'Teléfono'], ['servicio', 'Servicio'], ['comentarios', 'Comentarios'], ['estado', 'Estado'], ['notas', 'Notas']];
+    var lines = [cols.map(function (c) { return c[1]; }).join(',')];
+    filtered().forEach(function (r) { lines.push(cols.map(function (c) { return csvCell(c[0] === 'creado' ? fmtDate(r.creado) : r[c[0]]); }).join(',')); });
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'cotizaciones-link-ia-' + isoDaysAgo(0) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  }
+  function reloadRows() {
+    return api('/rest/v1/' + QUOTE_TABLE + '?select=*&order=creado.desc&limit=1000').then(function (r) { S.rows = r || []; render(); toast('Lista actualizada'); }).catch(function (e) { toast(errText(e), true); });
+  }
+
+  /* ===== EDITORES DE CONFIGURACIÓN ===== */
+  function fld(label, path, opts) {
+    opts = opts || {};
+    var v = getPath(S.cfg, path), tag = opts.area ? 'textarea' : 'input';
+    if (opts.tags) v = (v || []).join(', ');
+    var attrs = ' data-p="' + esc(path) + '"' + (opts.tags ? ' data-t="tags"' : '') + (opts.ph ? ' placeholder="' + esc(opts.ph) + '"' : '') + (opts.type && !opts.area ? ' type="' + opts.type + '"' : '') + (opts.inputmode ? ' inputmode="' + opts.inputmode + '"' : '');
+    var id = 'f_' + path.replace(/\W/g, '_');
+    return '<div class="field' + (opts.cls ? ' ' + opts.cls : '') + '"><label for="' + id + '">' + esc(label) + '</label>' +
+      (opts.area ? '<textarea id="' + id + '"' + attrs + '>' + esc(v) + '</textarea>' : '<input id="' + id + '"' + attrs + ' value="' + esc(v) + '">') +
+      (opts.hint ? '<span class="hint">' + opts.hint + '</span>' : '') + '</div>';
+  }
+  function imgFld(label, path, hint) {
+    var v = getPath(S.cfg, path) || '', id = 'f_' + path.replace(/\W/g, '_');
+    return '<div class="field"><label for="' + id + '">' + esc(label) + '</label><div class="imgf"><div class="thumb" style="' + (safeUrl(v) ? 'background-image:url(&quot;' + esc(v) + '&quot;)' : '') + '"></div>' +
+      '<input class="f" id="' + id + '" data-p="' + esc(path) + '" placeholder="https://… o sube un archivo" value="' + esc(v) + '">' +
+      '<button class="btn btn--ghost btn--sm" type="button" data-act="upload" data-path="' + esc(path) + '">Subir imagen</button>' +
+      (v ? '<button class="btn btn--ghost btn--sm" type="button" data-act="clearimg" data-path="' + esc(path) + '">Quitar</button>' : '') + '</div>' +
+      (hint ? '<span class="hint">' + hint + '</span>' : '') + '</div>';
+  }
+  function ctl(list, i, n) {
+    return '<button class="btn btn--ghost btn--sm btn--icon" type="button" data-act="up" data-list="' + list + '" data-i="' + i + '" aria-label="Subir"' + (i === 0 ? ' disabled' : '') + '>▲</button>' +
+      '<button class="btn btn--ghost btn--sm btn--icon" type="button" data-act="down" data-list="' + list + '" data-i="' + i + '" aria-label="Bajar"' + (i === n - 1 ? ' disabled' : '') + '>▼</button>' +
+      '<button class="btn btn--danger btn--sm" type="button" data-act="del" data-list="' + list + '" data-i="' + i + '">Quitar</button>';
+  }
+  function chk(label, path, on) {
+    return '<label class="chk"><input type="checkbox" data-t="bool" data-p="' + esc(path) + '"' + (on ? ' checked' : '') + '> ' + label + '</label>';
+  }
+
+  function viewContacto() {
+    var wa = digits(S.cfg.whatsapp); if (wa.length === 10) wa = '52' + wa;
+    return '<div class="card"><h1 class="h">WhatsApp</h1><p class="sub">Este número recibe los mensajes de todos los botones de WhatsApp de la página.</p>' +
+      '<div class="grid2">' + fld('Número de WhatsApp', 'whatsapp', { inputmode: 'tel', ph: '523325941532', hint: 'Con código de país y sin espacios ni signos. México: 52 + 10 dígitos (ej. 523325941532). Si escribes solo 10 dígitos se agrega el 52.' }) + '</div>' +
+      (wa.length >= 11 ? '<p class="hint" style="margin-top:10px">Prueba: <a href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">https://wa.me/' + esc(wa) + '</a></p>' : '<div class="msg warn">El número parece incompleto.</div>') + '</div>' +
+      '<div class="card"><h1 class="h">Datos de contacto</h1><p class="sub">Aparecen en el pie de página.</p><div class="grid2">' +
+      fld('Teléfono', 'contacto.telefono', { inputmode: 'tel', ph: '+52 33 2594 1532' }) + fld('Correo', 'contacto.correo', { type: 'email', ph: 'contacto@tuempresa.com' }) + '</div>' +
+      fld('Dirección', 'contacto.direccion', { area: true, hint: 'Puedes escribir varias líneas.' }) + '</div>';
+  }
+
+  function viewServicios() {
+    var a = S.cfg.servicios;
+    var h = '<div class="card"><div class="row"><div><h1 class="h">Servicios</h1><p class="sub">Agrega, quita u ordena los servicios. También se actualiza la lista del formulario de cotización.</p></div><span class="sp"></span><button class="btn" type="button" data-act="add" data-list="servicios">+ Agregar servicio</button></div>';
+    if (!a.length) h += '<div class="empty">No hay servicios.</div>';
+    a.forEach(function (s, i) {
+      var p = 'servicios.' + i + '.';
+      h += '<div class="item' + (s.visible === false ? ' off' : '') + '"><div class="item__h"><span class="num">' + (i + 1) + '</span><b>' + esc(s.titulo || 'Nuevo servicio') + '</b>' + chk('Visible', p + 'visible', s.visible !== false) + ctl('servicios', i, a.length) + '</div>' +
+        '<div class="grid2">' + fld('Título', p + 'titulo') +
+        '<div class="field"><label for="ic' + i + '">Ícono</label><div class="row" style="flex-wrap:nowrap"><svg class="ico" style="width:30px;height:30px;color:var(--blue-ink)"><use href="#i-' + esc(s.icono) + '"/></svg><select id="ic' + i + '" data-p="' + p + 'icono">' +
+        ICONS.map(function (n) { return '<option value="' + n + '"' + (s.icono === n ? ' selected' : '') + '>' + ICON_NAMES[n] + '</option>'; }).join('') + '</select></div></div></div>' +
+        fld('Descripción', p + 'descripcion', { area: true }) + fld('Etiquetas', p + 'etiquetas', { tags: true, ph: 'Cat6A, TIA/EIA', hint: 'Separadas por comas (opcional).' }) + imgFld('Imagen de la tarjeta', p + 'imagen') + '</div>';
+    });
+    return h + '</div>';
+  }
+
+  function viewNoticias() {
+    var a = S.cfg.noticias;
+    var h = '<div class="card"><div class="row"><div><h1 class="h">Noticias</h1><p class="sub">Tarjetas de la sección "Últimas Noticias de Tecnología".</p></div><span class="sp"></span><button class="btn" type="button" data-act="add" data-list="noticias">+ Agregar noticia</button></div>';
+    if (!a.length) h += '<div class="empty">No hay noticias. La sección mostrará un aviso de "Pronto publicaremos nuevas noticias".</div>';
+    a.forEach(function (n, i) {
+      var p = 'noticias.' + i + '.';
+      h += '<div class="item"><div class="item__h"><span class="num">' + (i + 1) + '</span><b>' + esc(n.titulo || 'Nueva noticia') + '</b>' + ctl('noticias', i, a.length) + '</div>' +
+        fld('Título', p + 'titulo') + '<div class="grid2">' + fld('Categoría', p + 'categoria', { ph: 'Ciberseguridad' }) + fld('Fecha', p + 'fecha', { type: 'date' }) + '</div>' +
+        fld('Resumen', p + 'resumen', { area: true }) + fld('Enlace de "Leer más"', p + 'url', { ph: 'https://…', hint: 'Dirección completa de la nota (empieza con https://). Si lo dejas vacío no lleva a ningún lado.' }) + imgFld('Imagen', p + 'imagen') + '</div>';
+    });
+    return h + '</div>';
+  }
+
+  function viewModulos() {
+    var h = '<div class="card"><h1 class="h">Módulos de la página</h1><p class="sub">Activa o desactiva secciones completas. La portada y el pie de página siempre se muestran.</p><div class="mods">' +
+      MODULES.map(function (m) { var on = !(S.cfg.modulos && S.cfg.modulos[m[0]] === false); return '<div class="mod"><span><b>' + m[1] + '</b><small>' + m[2] + '</small></span><label class="sw"><input type="checkbox" data-t="bool" data-p="modulos.' + m[0] + '"' + (on ? ' checked' : '') + ' aria-label="' + m[1] + '"><i></i></label></div>'; }).join('') + '</div></div>';
+    var a = S.cfg.bloques;
+    h += '<div class="card"><div class="row"><div><h1 class="h">Módulos propios</h1><p class="sub">Agrega bloques de texto con imagen y botón (por ejemplo "Quiénes somos", "Clientes", una promoción) en la posición que quieras.</p></div><span class="sp"></span><button class="btn" type="button" data-act="add" data-list="bloques">+ Agregar módulo</button></div>';
+    if (!a.length) h += '<div class="empty">Todavía no agregaste módulos propios.</div>';
+    a.forEach(function (b, i) {
+      var p = 'bloques.' + i + '.';
+      h += '<div class="item' + (b.visible === false ? ' off' : '') + '"><div class="item__h"><span class="num">' + (i + 1) + '</span><b>' + esc(b.titulo || 'Módulo nuevo') + '</b>' + chk('Visible', p + 'visible', b.visible !== false) + ctl('bloques', i, a.length) + '</div>' +
+        fld('Título', p + 'titulo') + fld('Texto', p + 'texto', { area: true }) +
+        '<div class="grid2"><div class="field"><label for="po' + i + '">Posición</label><select id="po' + i + '" data-p="' + p + 'posicion">' + Object.keys(SLOTS).map(function (k) { return '<option value="' + k + '"' + (b.posicion === k ? ' selected' : '') + '>' + SLOTS[k] + '</option>'; }).join('') + '</select></div>' +
+        '<div class="field"><label for="fo' + i + '">Fondo</label><select id="fo' + i + '" data-p="' + p + 'fondo"><option value="claro"' + (b.fondo !== 'suave' ? ' selected' : '') + '>Blanco</option><option value="suave"' + (b.fondo === 'suave' ? ' selected' : '') + '>Gris claro</option></select></div></div>' +
+        '<div class="grid2">' + fld('Texto del botón (opcional)', p + 'boton_texto') + fld('Enlace del botón', p + 'boton_url', { ph: 'https://… o #cotizar' }) + '</div>' + imgFld('Imagen (opcional)', p + 'imagen') + '</div>';
+    });
+    return h + '</div>';
+  }
+
+  function viewImagenes() {
+    return '<div class="card"><h1 class="h">Logo e imágenes</h1><p class="sub">Las imágenes de cada servicio y noticia se cambian en sus pestañas. Aquí están el logo y la foto de la portada.</p>' +
+      imgFld('Logo (reemplaza el texto "Link IA")', 'logo', 'Mejor un PNG con fondo transparente y letras claras, porque el encabezado es azul marino.') +
+      imgFld('Foto de fondo de la portada (opcional)', 'hero_imagen', 'Se muestra tenue detrás del título. Usa una imagen horizontal de buena calidad.') + '</div>' +
+      '<div class="card"><h1 class="h">Valores de fábrica</h1><p class="sub">Vuelve todo el contenido de la página (servicios, noticias, módulos, contacto) a como venía al inicio. Las cotizaciones no se tocan. Se aplica cuando guardes.</p>' +
+      '<button class="btn btn--danger" style="margin-top:12px" type="button" data-act="reset">Restablecer contenido</button></div>';
+  }
+
+  /* ---------- Subida de imágenes (se reducen a 1600 px) ------------------- */
+  function resizeImage(file) {
+    return new Promise(function (resolve, reject) {
+      if (/svg|gif/.test(file.type)) return resolve(file);
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var m = 1600, k = Math.min(1, m / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+        var type = /png|webp/.test(file.type) ? 'image/png' : 'image/jpeg';
+        c.toBlob(function (b) { b ? resolve(b) : reject(new Error('No se pudo procesar la imagen')); }, type, 0.86);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('El archivo no es una imagen válida')); };
+      img.src = url;
+    });
+  }
+  function uploadImage(path) {
+    var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = function () {
+      var f = inp.files && inp.files[0]; if (!f) return;
+      if (f.size > 15 * 1024 * 1024) { toast('La imagen pesa más de 15 MB.', true); return; }
+      toast('Subiendo imagen…');
+      resizeImage(f).then(function (blob) {
+        var ext = blob.type === 'image/png' ? 'png' : blob.type === 'image/svg+xml' ? 'svg' : blob.type === 'image/gif' ? 'gif' : 'jpg';
+        var name = 'img/' + Date.now() + '-' + Math.random().toString(36).slice(2, 7) + '.' + ext;
+        return ensureToken().then(function () {
+          return fetch(base() + '/storage/v1/object/' + BUCKET + '/' + name, { method: 'POST', headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + S.session.access, 'Content-Type': blob.type, 'x-upsert': 'false' }, body: blob });
+        }).then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 120)); }); return base() + '/storage/v1/object/public/' + BUCKET + '/' + name; });
+      }).then(function (url) { setPath(S.cfg, path, url); render(); toast('Imagen subida. Recuerda guardar los cambios.'); })
+        .catch(function (e) { toast(/HTTP 4/.test(e.message) ? 'No se pudo subir la imagen. ¿Ejecutaste el SQL de almacenamiento? (' + e.message + ')' : errText(e), true); });
+    };
+    inp.click();
+  }
+
+  /* ---------- Guardar la configuración ------------------------------------ */
+  function validate() {
+    var c = S.cfg, wa = digits(c.whatsapp);
+    if (wa.length < 10 || wa.length > 15) return 'El número de WhatsApp debe tener entre 10 y 15 dígitos.';
+    if (c.contacto.correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.contacto.correo)) return 'El correo de contacto no es válido.';
+    for (var i = 0; i < c.servicios.length; i++) if (!String(c.servicios[i].titulo || '').trim()) return 'El servicio ' + (i + 1) + ' no tiene título.';
+    for (var j = 0; j < c.noticias.length; j++) { var n = c.noticias[j]; if (!String(n.titulo || '').trim()) return 'La noticia ' + (j + 1) + ' no tiene título.'; if (n.url && !/^(https?:\/\/|#)/i.test(n.url)) return 'El enlace de la noticia ' + (j + 1) + ' debe empezar con https://'; }
+    for (var k = 0; k < c.bloques.length; k++) { var b = c.bloques[k]; if (!String(b.titulo || '').trim() && !String(b.texto || '').trim()) return 'El módulo propio ' + (k + 1) + ' está vacío.'; if (b.boton_url && !/^(https?:\/\/|#)/i.test(b.boton_url)) return 'El enlace del botón del módulo ' + (k + 1) + ' debe empezar con https:// o #'; }
+    return '';
+  }
+  function save() {
+    var bad = validate(); if (bad) { toast(bad, true); return; }
+    var btn = $('#saveBtn'); btn.disabled = true; btn.textContent = 'Guardando…';
+    var snap = JSON.stringify(S.cfg);
+    api('/rest/v1/' + CONFIG_TABLE + '?on_conflict=id', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ id: 1, config: S.cfg, actualizado: new Date().toISOString() }) })
+      .then(function () { S.saved = snap; toast('Cambios guardados. La página ya los muestra.'); render(); })
+      .catch(function (e) { if (e.message === 'AUTH') logout('Tu sesión expiró. Vuelve a entrar.'); else toast(errText(e), true); })
+      .then(function () { btn.disabled = false; btn.textContent = 'Guardar cambios'; });
+  }
+
+  /* ---------- Eventos ------------------------------------------------------ */
+  var NEW_ITEM = {
+    servicios: function () { return { titulo: '', icono: 'bulb', etiquetas: [], descripcion: '', imagen: '', visible: true }; },
+    noticias: function () { return { categoria: '', titulo: '', resumen: '', fecha: isoDaysAgo(0), url: '', imagen: '' }; },
+    bloques: function () { return { titulo: '', texto: '', imagen: '', boton_texto: '', boton_url: '', posicion: 'servicios', fondo: 'claro', visible: true }; }
+  };
+  function onField(el) {
+    var p = el.getAttribute('data-p'), t = el.getAttribute('data-t'), v;
+    if (t === 'bool') v = el.checked;
+    else if (t === 'tags') v = el.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+    else v = el.value;
+    setPath(S.cfg, p, v);
+    markDirty();
+    if (/\.visible$/.test(p)) { render(); return; }
+    if (el.type !== 'checkbox' && el.tagName !== 'SELECT') {
+      var th = el.closest('.imgf'); if (th) { var d = $('.thumb', th); if (d) d.style.backgroundImage = safeUrl(v) ? 'url("' + v + '")' : ''; }
+    }
+  }
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.id === 'q') { S.f.q = el.value; var pos = el.selectionStart; S.open = null; render(); var q = $('#q'); q.focus(); try { q.setSelectionRange(pos, pos); } catch (x) { /* ok */ } return; }
+    if (el.hasAttribute('data-p') && el.type !== 'checkbox' && el.tagName !== 'SELECT') onField(el);
+  });
+  document.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.id === 'fServ') { S.f.servicio = el.value; S.open = null; render(); return; }
+    if (el.getAttribute('data-act') === 'estado' && el.tagName === 'SELECT') { setEstado(el.dataset.id, el.value); return; }
+    if (el.hasAttribute('data-p') && (el.type === 'checkbox' || el.tagName === 'SELECT')) onField(el);
+  });
+  function setEstado(id, estado) {
+    api('/rest/v1/' + QUOTE_TABLE + '?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ estado: estado }) })
+      .then(function () { S.rows.forEach(function (r) { if (r.id === id) r.estado = estado; }); render(); toast('Estado actualizado'); })
+      .catch(function (e) { toast(errText(e), true); render(); });
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-act]'); if (!t || t.tagName === 'SELECT') return;
+    var a = t.dataset.act, list = t.dataset.list, i = +t.dataset.i;
+    if (a === 'tab') { S.tab = t.dataset.v; S.open = null; render(); window.scrollTo(0, 0); }
+    else if (a === 'logout') { if (!isDirty() || confirm('Hay cambios sin guardar. ¿Salir de todos modos?')) logout(''); }
+    else if (a === 'save') save();
+    else if (a === 'discard') { if (confirm('¿Descartar los cambios sin guardar?')) { S.cfg = JSON.parse(S.saved); render(); } }
+    else if (a === 'reset') { if (confirm('Esto restablece servicios, noticias, módulos, contacto e imágenes a los valores de fábrica (se aplica al guardar). ¿Continuar?')) { S.cfg = normalize(clone(DEFAULTS)); render(); toast('Contenido restablecido. Guarda para aplicarlo.'); } }
+    else if (a === 'add') { S.cfg[list].push(NEW_ITEM[list]()); render(); var items = $$('.item'); if (items.length) items[items.length - 1].scrollIntoView({ block: 'center' }); }
+    else if (a === 'del') { if (confirm('¿Quitar este elemento?')) { S.cfg[list].splice(i, 1); render(); } }
+    else if (a === 'up' || a === 'down') { var j = a === 'up' ? i - 1 : i + 1, arr = S.cfg[list]; if (j >= 0 && j < arr.length) { var x = arr[i]; arr[i] = arr[j]; arr[j] = x; render(); } }
+    else if (a === 'upload') uploadImage(t.dataset.path);
+    else if (a === 'clearimg') { setPath(S.cfg, t.dataset.path, ''); render(); }
+    else if (a === 'csv') exportCsv();
+    else if (a === 'reload') reloadRows();
+    else if (a === 'toggle') { if (e.target.closest('a,button,select,input,textarea')) return; S.open = S.open === t.dataset.id ? null : t.dataset.id; render(); }
+    else if (a === 'nota') {
+      var id = t.dataset.id, nota = $('#nota').value;
+      api('/rest/v1/' + QUOTE_TABLE + '?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ notas: nota }) })
+        .then(function () { S.rows.forEach(function (r) { if (r.id === id) r.notas = nota; }); toast('Nota guardada'); })
+        .catch(function (er) { toast(errText(er), true); });
+    }
+    else if (a === 'delcot') {
+      if (!confirm('¿Eliminar esta cotización de forma definitiva?')) return;
+      var did = t.dataset.id;
+      api('/rest/v1/' + QUOTE_TABLE + '?id=eq.' + encodeURIComponent(did), { method: 'DELETE', headers: { Prefer: 'return=minimal' } })
+        .then(function () { S.rows = S.rows.filter(function (r) { return r.id !== did; }); S.open = null; render(); toast('Cotización eliminada'); })
+        .catch(function (er) { toast(errText(er), true); });
+    }
+  });
+  // Filtro por tarjetas de estado
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button[data-act="festado"]'); if (!t) return;
+    S.f.estado = t.dataset.v; S.open = null; render();
+  });
+  window.addEventListener('beforeunload', function (e) { if (S.cfg && isDirty()) { e.preventDefault(); e.returnValue = ''; } });
+
+  /* ---------- Inicio ------------------------------------------------------- */
+  if (!SUPABASE_URL || !SUPABASE_KEY) { showLogin(''); return; }
+  loadSession();
+  if (S.session) { showLogin(''); start(); } else showLogin('');
+})();
+</script>
+</body>
+</html>
