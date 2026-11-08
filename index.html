@@ -258,6 +258,8 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
 .field input:user-invalid,.field select:user-invalid{border-color:#c0262d}
 .form-foot{margin-top:22px}
 .form-note{margin-top:14px;font-size:.84rem;color:var(--ink-2);text-align:center}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-status a{color:inherit;text-decoration:underline;font-weight:700}
 .form-status{margin-top:16px;padding:0;border-radius:12px;font-weight:600;text-align:center}
 .form-status.is-ok{padding:14px 16px;background:#e6f7ed;color:#0b5a2b;border:1px solid #a8e0bd}
 .form-status.is-error{padding:14px 16px;background:#fdecee;color:#8b1a22;border:1px solid #f2b6bb}
@@ -655,7 +657,7 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
           </div>
           <div class="field">
             <label for="telefono">Teléfono <i>*</i></label>
-            <input id="telefono" name="telefono" type="tel" autocomplete="tel" required inputmode="tel" placeholder="55 1234 5678">
+            <input id="telefono" name="telefono" type="tel" autocomplete="tel" required inputmode="tel" placeholder="33 1234 5678">
           </div>
           <div class="field field--full">
             <label for="servicio">Selecciona el servicio a cotizar <i>*</i></label>
@@ -675,6 +677,8 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
               <option value="Otros (Especificar en comentarios)">Otros (Especificar en comentarios)</option>
             </select>
           </div>
+          <!-- Campo trampa anti-spam: las personas no lo ven; los robots lo llenan -->
+          <div class="hp" aria-hidden="true"><label for="web">No llenar</label><input id="web" name="web" type="text" tabindex="-1" autocomplete="off"></div>
           <div class="field field--full">
             <label for="comentarios">Detalles adicionales / Comentarios</label>
             <textarea id="comentarios" name="comentarios" placeholder="Describe tu proyecto: ubicación, número de equipos o usuarios, tiempos esperados…"></textarea>
@@ -720,9 +724,9 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
         <h3>Contacto</h3>
         <ul class="contact-list">
           <!-- ↓↓↓ CAMBIA ESTOS DATOS POR LOS REALES DE TU EMPRESA ↓↓↓ -->
-          <li><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span>Guadalajara Jalisco, Col. Centro,<br> C.P. 44810</span></li>
-          <li><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg><a href="tel:3325941532">+3325941532</a></li>
-          <li><svg 
+          <li><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span>Calle Principal 123, Col. Centro,<br>Ciudad de México, CDMX, C.P. 06000</span></li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg><a href="tel:+523325941532">+52 33 2594 1532</a></li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg><a href="mailto:contacto@linkia.com.mx">contacto@linkia.com.mx</a></li>
           <!-- ↑↑↑ -->
         </ul>
       </div>
@@ -759,11 +763,15 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
   'use strict';
 
   /* ---------- CONFIGURACIÓN (edita aquí) ---------------------------------- */
-  // Tu número de WhatsApp con código de país y sin signos ni espacios. Ejemplo México: '5215512345678'
-  var WHATSAPP_NUMBER = 'TUNUMERO';
-  // Dirección que recibirá el formulario (POST con JSON). Si se deja vacía, el formulario
-  // abre WhatsApp con la solicitud ya escrita. Ejemplo: 'https://tudominio.com/api/cotizaciones'
-  var FORM_ENDPOINT = '';
+  // WhatsApp de Link IA: código de país (52 = México) + número a 10 dígitos, sin signos ni espacios.
+  var WHATSAPP_NUMBER = '523325941532';
+
+  // BASE DE DATOS (Supabase): aquí se guardan las cotizaciones y contactos del formulario.
+  // Pega la URL del proyecto y la clave "anon public" (Supabase > Project Settings > API).
+  // Mientras estén vacías, el formulario solo abre WhatsApp con la solicitud escrita.
+  var SUPABASE_URL = '';   // ejemplo: 'https://abcdefgh.supabase.co'
+  var SUPABASE_KEY = '';   // clave anon public (empieza con 'eyJ...' o 'sb_publishable_...')
+  var SUPABASE_TABLE = 'cotizaciones';
 
   var $ = function (s, ctx) { return (ctx || document).querySelector(s); };
   var $$ = function (s, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(s)); };
@@ -891,8 +899,27 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
   var form = $('#quoteForm'), statusBox = $('#formStatus');
   function showStatus(kind, msg) { statusBox.className = 'form-status ' + (kind ? 'is-' + kind : ''); statusBox.textContent = msg; }
 
+  var sending = false;
+
+  function waLink(d) {
+    var texto = 'Hola, quiero solicitar una cotización de Link IA.\n' +
+      'Nombre: ' + d.nombre + '\nEmpresa: ' + d.empresa + '\nCorreo: ' + d.correo + '\nTeléfono: ' + d.telefono +
+      '\nServicio: ' + d.servicio + (d.comentarios ? '\nComentarios: ' + d.comentarios : '');
+    return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto);
+  }
+  // Muestra un mensaje con un enlace a WhatsApp (el texto del enlace se inserta de forma segura)
+  function showWithLink(kind, msg, linkText, href) {
+    statusBox.className = 'form-status is-' + kind;
+    statusBox.textContent = msg + ' ';
+    var a = document.createElement('a');
+    a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = linkText;
+    statusBox.appendChild(a);
+  }
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (sending) return;
+    if (form.web.value) { form.reset(); return; }          // robot detectado: se ignora en silencio
     if (!form.checkValidity()) {
       form.reportValidity();
       showStatus('error', 'Revisa los campos marcados y vuelve a intentarlo.');
@@ -903,19 +930,34 @@ section[id]{scroll-margin-top:calc(var(--header-h) - 8px)}
       telefono: form.telefono.value.trim(), servicio: form.servicio.value, comentarios: form.comentarios.value.trim()
     };
 
-    if (FORM_ENDPOINT) {
-      // Envío a tu servidor
+    if (SUPABASE_URL && SUPABASE_KEY) {
+      // Guarda el contacto en la base de datos
+      sending = true;
+      var btn = form.querySelector('button[type=submit]');
+      btn.disabled = true;
       showStatus('', 'Enviando…');
-      fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) })
+      fetch(SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/' + SUPABASE_TABLE, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(d)
+      })
         .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
-        .then(function () { form.reset(); showStatus('ok', 'Gracias, ' + d.nombre + '. Recibimos tu solicitud y te contactaremos pronto.'); })
-        .catch(function () { showStatus('error', 'No se pudo enviar la solicitud. Inténtalo de nuevo o escríbenos por WhatsApp.'); });
+        .then(function () {
+          form.reset();
+          showWithLink('ok', 'Gracias, ' + d.nombre + '. Recibimos tu solicitud y te contactaremos pronto.', 'Si es urgente, escríbenos por WhatsApp.', 'https://wa.me/' + WHATSAPP_NUMBER);
+        })
+        .catch(function () {
+          showWithLink('error', 'No pudimos guardar tu solicitud en este momento.', 'Envíala por WhatsApp.', waLink(d));
+        })
+        .then(function () { sending = false; btn.disabled = false; });
     } else {
-      // Sin servidor configurado: se abre WhatsApp con la solicitud lista para enviar
-      var texto = 'Hola, quiero solicitar una cotización de Link IA.\n' +
-        'Nombre: ' + d.nombre + '\nEmpresa: ' + d.empresa + '\nCorreo: ' + d.correo + '\nTeléfono: ' + d.telefono +
-        '\nServicio: ' + d.servicio + (d.comentarios ? '\nComentarios: ' + d.comentarios : '');
-      window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+      // Sin base de datos configurada: se abre WhatsApp con la solicitud lista para enviar
+      window.open(waLink(d), '_blank', 'noopener');
       showStatus('ok', 'Abrimos WhatsApp con tu solicitud lista. Solo falta enviarla desde ahí.');
     }
   });
